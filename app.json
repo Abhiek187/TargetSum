@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "TargetSum",
+    "entryPoint": "./index.js",
     "slug": "TargetSum",
     "version": "1.0.0",
     "orientation": "portrait",
