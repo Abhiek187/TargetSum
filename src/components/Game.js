@@ -1,11 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import PropTypes from "prop-types";
 import { StyleSheet, Text, View } from "react-native";
 import RandomNumber from "./RandomNumber";
 
-export default function Game({ randomNumberCount }) {
+export default function Game({ randomNumberCount, initialSeconds }) {
   const [selectedIds, setselectedIds] = useState([]);
+  const [remainingSeconds, setRemainingSeconds] = useState(initialSeconds);
 
   // Generate a random number between min (inclusive) and max (non-inclusive)
   const getRandomNumber = (min, max) => min + Math.floor((max - min) * Math.random());
@@ -20,6 +21,23 @@ export default function Game({ randomNumberCount }) {
   , [randomNumbers, randomNumberCount]);
   // TODO: Shuffle the random numbers
 
+  useEffect(() => {
+    // Start the game timer
+    const intervalId = setInterval(() => {
+      setRemainingSeconds(remainingSeconds => {
+        if (remainingSeconds - 1 === 0) {
+          clearInterval(intervalId);
+        }
+
+        return remainingSeconds - 1;
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
   // Check if the number is present in selectedIds array
   const isNumberSelected = numberIndex => selectedIds.indexOf(numberIndex) >= 0;
 
@@ -27,17 +45,17 @@ export default function Game({ randomNumberCount }) {
     setselectedIds([...selectedIds, numberIndex]);
   };
 
-  // Statuses: PLAYING, WON, LOST (IIFY)
+  // Statuses: PLAYING, WON, LOST (IIFE)
   const gameStatus = (() => {
     const sumSelected = selectedIds.reduce((acc, curr) =>
       acc + randomNumbers[curr], 0);
 
-    if (sumSelected < target) {
-      return "PLAYING";
+    if (sumSelected > target || remainingSeconds === 0) {
+      return "LOST";
     } else if (sumSelected === target) {
       return "WON";
     } else {
-      return "LOST";
+      return "PLAYING";
     }
   })();
 
@@ -57,13 +75,15 @@ export default function Game({ randomNumberCount }) {
           />
         )}
       </View>
+      <Text>{remainingSeconds}</Text>
       <StatusBar style="auto" />
     </View>
   );
 }
 
 Game.propTypes = {
-  randomNumberCount: PropTypes.number.isRequired
+  randomNumberCount: PropTypes.number.isRequired,
+  initialSeconds: PropTypes.number.isRequired
 };
 
 const styles = StyleSheet.create({
