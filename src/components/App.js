@@ -4,6 +4,6 @@ import Game from "./Game";
 
 export default function App() {
   return (
-    <Game />
+    <Game randomNumberCount={6} />
   );
 }
