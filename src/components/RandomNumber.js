@@ -4,7 +4,9 @@ import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 export default function RandomNumber({ id, number, isDisabled, onPress }) {
   const handlePress = () => {
-    onPress(id);
+    if (!isDisabled) {
+      onPress(id);
+    }
   };
 
   return (

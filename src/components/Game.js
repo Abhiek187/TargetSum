@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from "react-native";
 import RandomNumber from "./RandomNumber";
 
 export default function Game({ randomNumberCount }) {
-  const [selectedNumbers, setSelectedNumbers] = useState([]);
+  const [selectedIds, setselectedIds] = useState([]);
 
   // Generate a random number between min (inclusive) and max (non-inclusive)
   const getRandomNumber = (min, max) => min + Math.floor((max - min) * Math.random());
@@ -20,23 +20,39 @@ export default function Game({ randomNumberCount }) {
   , [randomNumbers, randomNumberCount]);
   // TODO: Shuffle the random numbers
 
-  // Check if the number is present in selectedNumbers array
-  const isNumberSelected = numberIndex => selectedNumbers.indexOf(numberIndex) >= 0;
+  // Check if the number is present in selectedIds array
+  const isNumberSelected = numberIndex => selectedIds.indexOf(numberIndex) >= 0;
 
   const selectNumber = numberIndex => {
-    setSelectedNumbers([...selectedNumbers, numberIndex]);
+    setselectedIds([...selectedIds, numberIndex]);
   };
+
+  // Statuses: PLAYING, WON, LOST (IIFY)
+  const gameStatus = (() => {
+    const sumSelected = selectedIds.reduce((acc, curr) =>
+      acc + randomNumbers[curr], 0);
+
+    if (sumSelected < target) {
+      return "PLAYING";
+    } else if (sumSelected === target) {
+      return "WON";
+    } else {
+      return "LOST";
+    }
+  })();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.target}>{target}</Text>
+      <Text style={[styles.target, styles[`STATUS_${gameStatus}`]]}>
+        {target}
+      </Text>
       <View style={styles.randomContainer}>
         {randomNumbers.map((randomNumber, index) =>
           <RandomNumber
             key={index}
             id={index}
             number={randomNumber}
-            isDisabled={isNumberSelected(index)}
+            isDisabled={isNumberSelected(index) || gameStatus !== "PLAYING"}
             onPress={selectNumber}
           />
         )}
@@ -68,5 +84,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-around"
+  },
+
+  STATUS_PLAYING: {
+    backgroundColor: "#bbb"
+  },
+
+  STATUS_WON: {
+    backgroundColor: "green"
+  },
+
+  STATUS_LOST: {
+    backgroundColor: "red"
   }
 });
