@@ -1,8 +1,9 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { StyleSheet, Text, View } from "react-native";
 import RandomNumber from "./RandomNumber";
+import shuffle from "lodash.shuffle";
 
 export default function Game({ randomNumberCount, initialSeconds }) {
   const [selectedIds, setselectedIds] = useState([]);
@@ -19,14 +20,20 @@ export default function Game({ randomNumberCount, initialSeconds }) {
   const target = useMemo(() =>
     randomNumbers.slice(0, randomNumberCount - 2).reduce((acc, curr) => acc + curr, 0)
   , [randomNumbers, randomNumberCount]);
-  // TODO: Shuffle the random numbers
+  // Shuffle the random numbers to keep the game interesting
+  const shuffledRandomNumbers = useMemo(() =>
+    shuffle(randomNumbers)
+  , [randomNumbers]);
+
+  // Reference keeps the value up to date even in an interval
+  const intervalId = useRef(null);
 
   useEffect(() => {
     // Start the game timer
-    const intervalId = setInterval(() => {
+    intervalId.current = setInterval(() => {
       setRemainingSeconds(remainingSeconds => {
         if (remainingSeconds - 1 === 0) {
-          clearInterval(intervalId);
+          clearInterval(intervalId.current);
         }
 
         return remainingSeconds - 1;
@@ -34,7 +41,7 @@ export default function Game({ randomNumberCount, initialSeconds }) {
     }, 1000);
 
     return () => {
-      clearInterval(intervalId);
+      clearInterval(intervalId.current);
     };
   }, []);
 
@@ -48,11 +55,13 @@ export default function Game({ randomNumberCount, initialSeconds }) {
   // Statuses: PLAYING, WON, LOST (IIFE)
   const gameStatus = (() => {
     const sumSelected = selectedIds.reduce((acc, curr) =>
-      acc + randomNumbers[curr], 0);
+      acc + shuffledRandomNumbers[curr], 0);
 
     if (sumSelected > target || remainingSeconds === 0) {
+      clearInterval(intervalId.current);
       return "LOST";
     } else if (sumSelected === target) {
+      clearInterval(intervalId.current);
       return "WON";
     } else {
       return "PLAYING";
@@ -65,7 +74,7 @@ export default function Game({ randomNumberCount, initialSeconds }) {
         {target}
       </Text>
       <View style={styles.randomContainer}>
-        {randomNumbers.map((randomNumber, index) =>
+        {shuffledRandomNumbers.map((randomNumber, index) =>
           <RandomNumber
             key={index}
             id={index}
