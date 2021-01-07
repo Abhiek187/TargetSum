@@ -1,11 +1,11 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import { StyleSheet, Text, View } from "react-native";
+import { Button, StyleSheet, Text, View } from "react-native";
 import RandomNumber from "./RandomNumber";
 import shuffle from "lodash.shuffle";
 
-export default function Game({ randomNumberCount, initialSeconds }) {
+export default function Game({ onPlayAgain, randomNumberCount, initialSeconds }) {
   const [selectedIds, setselectedIds] = useState([]);
   const [remainingSeconds, setRemainingSeconds] = useState(initialSeconds);
 
@@ -84,6 +84,9 @@ export default function Game({ randomNumberCount, initialSeconds }) {
           />
         )}
       </View>
+      {gameStatus !== "PLAYING" && (
+        <Button title="Play Again" onPress={onPlayAgain} />
+      )}
       <Text>{remainingSeconds}</Text>
       <StatusBar style="auto" />
     </View>
@@ -91,6 +94,7 @@ export default function Game({ randomNumberCount, initialSeconds }) {
 }
 
 Game.propTypes = {
+  onPlayAgain: PropTypes.func.isRequired,
   randomNumberCount: PropTypes.number.isRequired,
   initialSeconds: PropTypes.number.isRequired
 };
