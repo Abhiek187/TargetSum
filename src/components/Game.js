@@ -31,7 +31,7 @@ export default function Game({ onPlayAgain, randomNumberCount, initialSeconds })
   useEffect(() => {
     // Start the game timer
     intervalId.current = setInterval(() => {
-      setRemainingSeconds(remainingSeconds => {
+      setRemainingSeconds((remainingSeconds) => {
         if (remainingSeconds - 1 === 0) {
           clearInterval(intervalId.current);
         }
@@ -46,9 +46,9 @@ export default function Game({ onPlayAgain, randomNumberCount, initialSeconds })
   }, []);
 
   // Check if the number is present in selectedIds array
-  const isNumberSelected = numberIndex => selectedIds.indexOf(numberIndex) >= 0;
+  const isNumberSelected = (numberIndex) => selectedIds.indexOf(numberIndex) >= 0;
 
-  const selectNumber = numberIndex => {
+  const selectNumber = (numberIndex) => {
     setselectedIds([...selectedIds, numberIndex]);
   };
 
@@ -102,7 +102,7 @@ Game.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ddd'
+    backgroundColor: "#ddd"
   },
 
   target: {

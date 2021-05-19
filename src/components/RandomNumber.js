@@ -14,7 +14,7 @@ export default function RandomNumber({ id, number, isDisabled, onPress }) {
       <Text style={[styles.random, isDisabled && styles.disabled]}>{number}</Text>
     </TouchableOpacity>
   );
-};
+}
 
 RandomNumber.propTypes = {
   id: PropTypes.number.isRequired,
@@ -36,4 +36,4 @@ const styles = StyleSheet.create({
   disabled: {
     opacity: 0.3
   }
-})
+});
